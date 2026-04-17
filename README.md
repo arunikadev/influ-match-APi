@@ -1,24 +1,25 @@
-# InfluMatch API
+# 🎯 InfluMatch API
 
 Sistem backend REST API yang menghubungkan **UMKM** dengan **Influencer** melalui fitur *matching otomatis* berbasis kategori, budget, dan performa influencer.
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 | Komponen | Teknologi |
 |---|---|
 | Framework | FastAPI (Python 3.9+) |
 | ORM | SQLAlchemy |
 | Database | SQLite (influmatch.db) |
-| Autentikasi | JWT (python-jose + passlib/bcrypt) |
+| Autentikasi | JWT (python-jose) + **bcrypt** native |
 | Validasi | Pydantic v2 |
 | Dokumentasi | Swagger UI (`/docs`) |
 | Server | Uvicorn |
+| CI/CD | GitHub Actions |
 
 ---
 
-## How to Run
+## 🚀 How to Run
 
 ```bash
 # 1. Aktifkan virtual environment
@@ -35,7 +36,7 @@ Akses docs: **http://localhost:8000/docs**
 
 ---
 
-## ERD (Entity Relationship Diagram)
+## 🗄️ ERD (Entity Relationship Diagram)
 
 ```
 users (1) ──────────── (1) umkm_profiles
@@ -58,7 +59,7 @@ users (1) ──────────── (1) umkm_profiles
 
 ---
 
-## Role-Based Access Control
+## 👤 Role-Based Access Control
 
 | Role | Akses |
 |---|---|
@@ -68,21 +69,21 @@ users (1) ──────────── (1) umkm_profiles
 
 ---
 
-## API Endpoints
+## 📋 API Endpoints
 
-### Authentication
+### 🔐 Authentication
 | Method | Endpoint | Deskripsi | Auth |
 |---|---|---|---|
 | POST | `/auth/register` | Register akun baru | ❌ |
 | POST | `/auth/login` | Login, dapatkan JWT token | ❌ |
 
-### UMKM Profile
+### 🏪 UMKM Profile
 | Method | Endpoint | Deskripsi | Auth |
 |---|---|---|---|
 | POST | `/umkm/profile` | Buat profil UMKM | ✅ UMKM |
 | GET | `/umkm/profile/me` | Lihat profil saya | ✅ UMKM |
 
-### Campaign (CRUD Lengkap)
+### 🎯 Campaign (CRUD Lengkap)
 | Method | Endpoint | Deskripsi | Auth |
 |---|---|---|---|
 | POST | `/campaign` | Buat campaign baru | ✅ UMKM |
@@ -90,9 +91,9 @@ users (1) ──────────── (1) umkm_profiles
 | GET | `/campaign/{id}` | Detail campaign by ID | ✅ UMKM |
 | PUT | `/campaign/{id}` | Update campaign | ✅ UMKM |
 | DELETE | `/campaign/{id}` | Hapus campaign | ✅ UMKM |
-| GET | `/campaign/{id}/matches` | Matching influencer | ✅ UMKM |
+| GET | `/campaign/{id}/matches` | 🔥 Matching influencer | ✅ UMKM |
 
-### Influencer (CRUD Lengkap)
+### 📱 Influencer (CRUD Lengkap)
 | Method | Endpoint | Deskripsi | Auth |
 |---|---|---|---|
 | POST | `/influencer/profile` | Buat profil influencer | ✅ Influencer |
@@ -103,7 +104,7 @@ users (1) ──────────── (1) umkm_profiles
 
 ---
 
-## Matching Engine
+## 🧠 Matching Engine
 
 Sistem menghitung skor kecocokan antara campaign dan influencer:
 
@@ -119,15 +120,19 @@ Hasil diurutkan dari score **tertinggi ke terendah**.
 
 ---
 
-## Struktur Proyek
+## 📂 Struktur Proyek
 
 ```
 2A/
-├── main.py                  # Entry point FastAPI
-├── config.py                # Konfigurasi (JWT secret, DB URL)
-├── database.py              # Koneksi & session SQLAlchemy
-├── requirements.txt         # Dependensi Python
-├── README.md                # Dokumentasi proyek
+├── .github/
+│   └── workflows/
+│       └── ci.yml             # Konfigurasi GitHub Actions untuk CI
+├── main.py                    # Entry point FastAPI
+├── config.py                  # Konfigurasi (JWT secret, DB URL)
+├── database.py                # Koneksi & session SQLAlchemy
+├── requirements.txt           # Dependensi Python
+├── README.md                  # Dokumentasi proyek
+├── InfluMatch_API.postman_collection.json  # Postman Collection
 ├── models/
 │   ├── user.py
 │   ├── umkm_profile.py
@@ -157,13 +162,22 @@ Hasil diurutkan dari score **tertinggi ke terendah**.
 
 ---
 
-## Cara Testing (Flow)
+## 🔑 Cara Testing (Flow)
 
 1. **Register UMKM**: `POST /auth/register` → `{"email":"...", "password":"...", "role":"umkm"}`
 2. **Login**: `POST /auth/login` → copy `access_token`
-3. Gunakan token di header: `Authorization: Bearer <token>`
+3. Gunakan token di header Postman atau tekan tombol gembok di Swagger (`/docs`): `Authorization: Bearer <token>`
 4. **Buat profil UMKM**: `POST /umkm/profile`
 5. **Buat campaign**: `POST /campaign`
 6. **Register + Login Influencer** (tab/window baru)
 7. **Buat profil influencer**: `POST /influencer/profile`
-8. Kembali ke UMKM → **GET** `/campaign/{id}/matches` 
+8. Kembali ke token akun UMKM → **GET** `/campaign/{id}/matches` 🔥
+
+---
+
+## 🔄 CI/CD Automation
+
+Proyek ini telah menerapkan sistem **Continuous Integration (CI)** otomatis menggunakan **GitHub Actions**.
+Setiap kali ada pembaruan kode yang di-push ke branch `main`, GitHub akan otomatis melakukan:
+1. Instalasi ulang dependensi (`pip install -r requirements.txt`).
+2. Proses validasi _Syntax Check_ (`py_compile`) untuk mendeteksi *error* di file Python sebelum peluncuran.
