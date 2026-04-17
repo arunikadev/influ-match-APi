@@ -19,21 +19,21 @@ app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="""
-## 🎯 InfluMatch API
+## InfluMatch API
 
 Sistem backend REST API yang menghubungkan **UMKM** dengan **Influencer** melalui fitur
 **matching otomatis** berbasis kategori, budget, dan performa influencer.
 
 ---
 
-### 🔐 Authentication
+### Authentication
 Semua endpoint yang dilindungi memerlukan **Bearer Token** dari endpoint `/auth/login`.
 
-### 👥 Role
+### Role
 - **UMKM**: bisa membuat campaign dan melihat matching influencer
 - **Influencer**: bisa membuat/update profil
 
-### 🧠 Matching Engine
+### Matching Engine
 Sistem memberikan **score** untuk setiap influencer berdasarkan:
 - Category match → **+50**
 - Budget fit → **+30**  

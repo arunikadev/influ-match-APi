@@ -7,7 +7,7 @@ from models.user import User
 from schemas.umkm_profile import UMKMProfileCreate, UMKMProfileResponse
 from services.umkm_service import create_umkm_profile, get_my_umkm_profile
 
-router = APIRouter(prefix="/umkm", tags=["🏪 UMKM Profile"])
+router = APIRouter(prefix="/umkm", tags=["UMKM Profile"])
 
 
 @router.post("/profile", response_model=UMKMProfileResponse, status_code=201,

@@ -18,7 +18,7 @@ from services.influencer_service import (
     delete_influencer_profile,
 )
 
-router = APIRouter(prefix="/influencer", tags=["📱 Influencer"])
+router = APIRouter(prefix="/influencer", tags=["Influencer"])
 
 
 @router.post("/profile", response_model=InfluencerProfileResponse, status_code=201,

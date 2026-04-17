@@ -15,7 +15,7 @@ from services.campaign_service import (
 )
 from services.matching_service import get_campaign_matches
 
-router = APIRouter(prefix="/campaign", tags=["🏪 Campaign (UMKM only)"])
+router = APIRouter(prefix="/campaign", tags=["Campaign (UMKM only)"])
 
 
 @router.post("", response_model=CampaignResponse, status_code=201,
@@ -71,7 +71,7 @@ def delete(
 
 
 @router.get("/{campaign_id}/matches", response_model=MatchResultResponse,
-            summary="🔥 Get matching influencer untuk campaign ini")
+            summary="Get matching influencer untuk campaign ini")
 def match_influencers(
     campaign_id: int,
     db: Session = Depends(get_db),
