@@ -14,7 +14,7 @@ class Campaign(Base):
     category_target = Column(String, nullable=False)
     budget = Column(Float, nullable=False)
     description = Column(Text, nullable=True)
-    status = Column(String, default="active")  # active / closed
+    status = Column(String, default="active")  # active / closed (required)
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
