@@ -1,0 +1,390 @@
+{
+  "info": {
+    "_postman_id": "influmatch-api-collection",
+    "name": "InfluMatch API",
+    "description": "Koleksi Pengujian InfluMatch API — Proyek UTS Pemrograman Web Lanjutan\n\nFlow penggunaan:\n1. Register UMKM\n2. Login UMKM → copy access_token ke variable {{token_umkm}}\n3. Buat profil UMKM\n4. Buat Campaign\n5. Register Influencer\n6. Login Influencer → copy access_token ke variable {{token_influencer}}\n7. Buat profil Influencer\n8. Kembali ke UMKM → hit endpoint Matches",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "base_url", "value": "http://localhost:8000", "type": "string"},
+    {"key": "token_umkm", "value": "", "type": "string"},
+    {"key": "token_influencer", "value": "", "type": "string"},
+    {"key": "campaign_id", "value": "1", "type": "string"}
+  ],
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Register UMKM",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"]},
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"umkm@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"umkm\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Influencer",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"]},
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"influencer@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"influencer\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login UMKM",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var json = pm.response.json();", "pm.collectionVariables.set('token_umkm', json.access_token);"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"]},
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"umkm@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Influencer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var json = pm.response.json();", "pm.collectionVariables.set('token_influencer', json.access_token);"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"]},
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"influencer@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Tanpa Token (Expect 401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/campaign", "host": ["{{base_url}}"], "path": ["campaign"]}
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🏪 UMKM Profile",
+      "item": [
+        {
+          "name": "Buat Profil UMKM",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token_umkm}}"}
+            ],
+            "url": {"raw": "{{base_url}}/umkm/profile", "host": ["{{base_url}}"], "path": ["umkm", "profile"]},
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"business_name\": \"Toko Matcha Sejahtera\",\n  \"category\": \"food\",\n  \"description\": \"Jualan matcha premium impor dari Jepang\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lihat Profil UMKM Saya",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token_umkm}}"}],
+            "url": {"raw": "{{base_url}}/umkm/profile/me", "host": ["{{base_url}}"], "path": ["umkm", "profile", "me"]}
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🎯 Campaign (CRUD)",
+      "item": [
+        {
+          "name": "Buat Campaign (201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var json = pm.response.json();", "pm.collectionVariables.set('campaign_id', json.id);", "pm.test('Status 201', function() { pm.response.to.have.status(201); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token_umkm}}"}
+            ],
+            "url": {"raw": "{{base_url}}/campaign", "host": ["{{base_url}}"], "path": ["campaign"]},
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Promosi Matcha Ramadan 2024\",\n  \"category_target\": \"food\",\n  \"budget\": 1000000,\n  \"description\": \"Campaign promosi matcha premium selama bulan Ramadan\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Semua Campaign (200 OK)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('Status 200', function() { pm.response.to.have.status(200); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token_umkm}}"}],
+            "url": {"raw": "{{base_url}}/campaign", "host": ["{{base_url}}"], "path": ["campaign"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Get Campaign by ID (200 OK)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token_umkm}}"}],
+            "url": {"raw": "{{base_url}}/campaign/{{campaign_id}}", "host": ["{{base_url}}"], "path": ["campaign", "{{campaign_id}}"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Update Campaign (200 OK)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token_umkm}}"}
+            ],
+            "url": {"raw": "{{base_url}}/campaign/{{campaign_id}}", "host": ["{{base_url}}"], "path": ["campaign", "{{campaign_id}}"]},
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Promosi Matcha Ramadan 2024 - UPDATED\",\n  \"budget\": 1500000\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Campaign Tidak Ada (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('Status 404', function() { pm.response.to.have.status(404); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token_umkm}}"}],
+            "url": {"raw": "{{base_url}}/campaign/9999", "host": ["{{base_url}}"], "path": ["campaign", "9999"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Hapus Campaign (200 OK)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{token_umkm}}"}],
+            "url": {"raw": "{{base_url}}/campaign/{{campaign_id}}", "host": ["{{base_url}}"], "path": ["campaign", "{{campaign_id}}"]}
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📱 Influencer (CRUD)",
+      "item": [
+        {
+          "name": "Buat Profil Influencer (201 Created)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('Status 201', function() { pm.response.to.have.status(201); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token_influencer}}"}
+            ],
+            "url": {"raw": "{{base_url}}/influencer/profile", "host": ["{{base_url}}"], "path": ["influencer", "profile"]},
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"niche\": \"food\",\n  \"followers\": 50000,\n  \"engagement_rate\": 4.5,\n  \"price_rate\": 750000,\n  \"platform\": \"instagram\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lihat Profil Influencer Saya",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token_influencer}}"}],
+            "url": {"raw": "{{base_url}}/influencer/profile/me", "host": ["{{base_url}}"], "path": ["influencer", "profile", "me"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profil Influencer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token_influencer}}"}
+            ],
+            "url": {"raw": "{{base_url}}/influencer/profile", "host": ["{{base_url}}"], "path": ["influencer", "profile"]},
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"followers\": 75000,\n  \"engagement_rate\": 5.2,\n  \"price_rate\": 900000\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Daftar Semua Influencer (Publik)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/influencers", "host": ["{{base_url}}"], "path": ["influencers"]}
+          },
+          "response": []
+        },
+        {
+          "name": "Hapus Profil Influencer",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{token_influencer}}"}],
+            "url": {"raw": "{{base_url}}/influencer/profile", "host": ["{{base_url}}"], "path": ["influencer", "profile"]}
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔥 Matching Engine",
+      "item": [
+        {
+          "name": "Get Matching Influencer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function() { pm.response.to.have.status(200); });",
+                  "pm.test('Has results array', function() { var json = pm.response.json(); pm.expect(json.results).to.be.an('array'); });",
+                  "pm.test('Has score field', function() { var json = pm.response.json(); if(json.results.length > 0) { pm.expect(json.results[0].score).to.be.a('number'); } });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token_umkm}}"}],
+            "url": {"raw": "{{base_url}}/campaign/{{campaign_id}}/matches", "host": ["{{base_url}}"], "path": ["campaign", "{{campaign_id}}", "matches"]}
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔴 Validasi Error",
+      "item": [
+        {
+          "name": "Register Tanpa Field (422 Unprocessable)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('Status 422', function() { pm.response.to.have.status(422); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"]},
+            "body": {"mode": "raw", "raw": "{}"}
+          },
+          "response": []
+        },
+        {
+          "name": "Akses Campaign Tanpa Token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('Status 401', function() { pm.response.to.have.status(401); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "{{base_url}}/campaign", "host": ["{{base_url}}"], "path": ["campaign"]}
+          },
+          "response": []
+        },
+        {
+          "name": "UMKM Akses Endpoint Influencer (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('Status 403', function() { pm.response.to.have.status(403); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token_umkm}}"}],
+            "url": {"raw": "{{base_url}}/influencer/profile/me", "host": ["{{base_url}}"], "path": ["influencer", "profile", "me"]}
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
